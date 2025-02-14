@@ -16,6 +16,9 @@ from datetime import datetime
 #    "ms_token", None
 # )  # set your own ms_token, think it might need to have visited a profile
 # database_url = "postgresql://postgres:admin@localhost:5432/dbtiktok"
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 database_url = "postgresql://fbs:yah7WUy1Oi8G@192.168.11.202:5432/fbs"
 engine = create_engine(database_url)
 
@@ -35,11 +38,12 @@ class UserInfo:
     source_name = ""
 
     async def user_profile_data(all_users):
+        logging.debug(f"Starting user_profile_data with users: {all_users}")
         async with TikTokApi() as api:
             sources = ["".join(user) for user in all_users]
             for source in sources:
                 UserInfo.source = source
-                print(source)
+                logging.debug(f"Processing source: {source}")
                 # test_user = 'rfaburmese'
                 await api.create_sessions(
                     ms_tokens=[ms_token],
@@ -63,7 +67,7 @@ class UserInfo:
                 friendCount = user_data["userInfo"]["stats"].get("friendCount")
                 heartCount = user_data["userInfo"]["stats"].get("heartCount")
                 post_count = user_data["userInfo"]["stats"].get("videoCount")
-                print(f"User {UserInfo.source} has follower count {followerCount},following count {followingCount}, friend count {friendCount}, heart count {heartCount} ,post count {post_count}.")
+                logging.debug(f"User {UserInfo.source} has follower count {followerCount},following count {followingCount}, friend count {friendCount}, heart count {heartCount} ,post count {post_count}.")
                 ### for specific user
                 # print(f"User {UserInfo.source_name} has follower count {followerCount}, following count {followingCount}, friend count {friendCount}, heart count {heartCount}, post count {post_count}.")
 
@@ -162,7 +166,7 @@ async def insert_video():
                     app.db.session.add(users_videos)
                     await asyncio.sleep(3)
                     app.db.session.commit()
-                    print(
+                    logging.debug(
                         "video data source is added successful, video id : {},comment : {}, collect : {}, play : {}, share : {}".format(
                             video_id,video_commentcount,video_collectcount,video_playcount,video_sharecount
                         )
@@ -200,7 +204,7 @@ async def insert_video():
 
                     # Execute the insert statement
                     app.db.session.execute(insert_allcontent)
-                    print("Added content id values : {} for network id 5".format(ids))
+                    logging.debug("Added content id values : {} for network id 5".format(ids))
 
                 except Exception as e:
                     print(f"Error updating data: {e}")
@@ -230,7 +234,7 @@ async def insert_video():
                     app.db.session.execute(update_user_videos)
                     await asyncio.sleep(3)
                     app.db.session.commit()
-                    print(
+                    logging.debug(
                         "video data source is updated successful, video id : {},comment : {}, collect : {}, play : {}, share : {}".format(
                             video_id,video_commentcount,video_collectcount,video_playcount,video_sharecount
                         )
@@ -247,15 +251,32 @@ if __name__ == "__main__":
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    all_users = session.query(users).with_entities(app.TikTokSources.source_name).all()
-    rand_source = random.sample(all_users, 7)
+    # all_users = session.query(users).with_entities(app.TikTokSources.source_name).filter(app.TikTokSources.owner != 1).all()
+    all_users = session.query(users).with_entities(app.TikTokSources.source_name).filter(
+        (app.TikTokSources.owner == None)& (app.TikTokSources.source_check == True)
+    ).all()
+    # rand_source = random.sample(all_users, 7)
+    # sources = ["".join(user) for user in rand_source]
+    # print(sources)
+
+    all_users_list = [user.source_name for user in all_users]    
+    sample_size = min(7, len(all_users_list))  # Ensure sample size is not larger than the population
+    rand_source = random.sample(all_users_list, sample_size)
+
     sources = ["".join(user) for user in rand_source]
     print(sources)
 
     # source_name = input("Enter source name : ")
     # sources = [source_name] #yangonmediagroup #1108 #elevenmedia sayargyi7635 xinhuamyanmar hkwanntout mtnewstoday npnews3 cnimyanmar09 shwemm143 97media_myanmar dvb.burmese people.media1
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete((UserInfo.user_profile_data(sources)))
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete((UserInfo.user_profile_data(sources)))
 
-    loop.close()
+    # loop.close()
+
+    loop = asyncio.get_event_loop()
+    try:
+        loop.run_until_complete(UserInfo.user_profile_data(sources))
+    finally:
+        loop.close()
+        session.close() 
