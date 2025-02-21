@@ -134,16 +134,51 @@ async def insert_video():
                     f"Added video id: {video_id}, source id: {source_id},create time: {datetime.utcfromtimestamp(video_createtime)}"
                 )
 
+                # content_id collect from table tiktokvideo info
+                content = (
+                        app.db.session.query(app.TikTokVideosInfo.id)
+                        .filter(app.TikTokVideosInfo.video_id == video_id)
+                        .all()
+                    )
+
+                    # Extracting the id values from the result
+                ids = [row.id for row in content]
+
+                    # Reflect the  table from the database
+                content_table = Table("all_content", metadata, autoload_with=engine)
+
+                    # Access the columns of the "content" table
+                columns = content_table.columns.keys()
+
+                    # Print the column names
+                content_column = columns[1]
+                network_column = columns[2]
+                    # print("content_column {},network_column {}".format(ids,5))
+
+                    # Define the values to insert
+                values_to_insert = [
+                        {content_column: content_id, network_column: 5}
+                        for content_id in ids
+                    ]
+
+                    # Create an insert statement
+                insert_allcontent = content_table.insert().values(values_to_insert)
+
+                    # Execute the insert statement
+                app.db.session.execute(insert_allcontent)
+                logging.debug("Added content id values : {} for network id 5".format(ids))
+
 async def check_and_crawl_users():
     with app.app.app_context():
         app.db.create_all()
-        users = app.TikTokSources.query.filter(app.TikTokSources.owner == 1)&(app.TikTokSources.source_check == True).all()
+        users = app.TikTokSources.query.filter((app.TikTokSources.owner == 1)&(app.TikTokSources.source_check == True)).all()
         if len(users) > 10:
             users = random.sample(users, 10)
         sources = ["".join(user.source_name) for user in users]
         await UserInfo.user_profile_data(sources)
 
 if __name__ == "__main__":
+    metadata = MetaData()
     loop = asyncio.get_event_loop()
     loop.run_until_complete(check_and_crawl_users())
     loop.close()
