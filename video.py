@@ -80,7 +80,7 @@ class UserInfo:
                 # print(vcounts)
 
                 ####users videos collect#######
-                async for video in user.videos(count=50):
+                async for video in user.videos(count=30):
                 #### for specific user   
                 # async for video in user.videos(count=post_count):
                     # print(video.as_dict)
