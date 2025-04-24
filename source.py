@@ -194,7 +194,7 @@ if __name__ == "__main__":
     sources = ["".join(user) for user in rand_source]
     # print(sources)
 
-    sources = ["baba.gyi34"] #yangonmediagroup #1108 #elevenmedia
+    sources = ["aunggyi_007"] #yangonmediagroup #1108 #elevenmedia
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete((UserInfo.user_profile_data(sources)))

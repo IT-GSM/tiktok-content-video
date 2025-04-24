@@ -16,6 +16,8 @@ from datetime import datetime
 #    "ms_token", None
 # )  # set your own ms_token, think it might need to have visited a profile
 # database_url = "postgresql://postgres:admin@localhost:5432/dbtiktok"
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 database_url = "postgresql://fbs:yah7WUy1Oi8G@192.168.11.202:5432/fbs"
 engine = create_engine(database_url)
 
@@ -31,7 +33,7 @@ ms_token = os.environ.get(
 class UserInfo:
     o_data = []
     vo_data = []
-    source = "elevenmedia"
+    # source = "elevenmedia"
     source_name = []
 
     async def user_profile_data(all_users):
@@ -53,11 +55,10 @@ class UserInfo:
                 # user = api.user(UserInfo.source)
                 ### for specific user
                 # UserInfo.source_name = input("Enter source name : ") mtnewstoday xinhuamyanmar people.media1 dvb.burmese zayartbz7news isp_myanmar dawnamedia thnmedia kicnews97 yokekhasoe zinkooo6698
-                # moi_myanmar sniper.su.primemedia skynetmm user2243025158316 people.media.myanmar curiousinsighter 97media_myanmar shweyote47
-            user = api.user("truesight_lover001")
-
+                # moi_myanmar sniper.su.primemedia skynetmm people.media.myanmar curiousinsighter 97media_myanmar shweyote47 vidya_myanmar oungmarine.update chairmanofusdp
+                #k.y655 
+            user = api.user("cnimyanmar09")
                 # print(user)
-
             user_data = await user.info()
                 # print(user_data)
             followerCount = user_data["userInfo"]["stats"].get("followerCount")
@@ -67,7 +68,7 @@ class UserInfo:
             post_count = user_data["userInfo"]["stats"].get("videoCount")
                 # print(f"User {UserInfo.source} has follower count {followerCount},following count {followingCount}, friend count {friendCount}, heart count {heartCount} ,post count {post_count}.")
                 ### for specific user
-            print(f"User {UserInfo.source_name} has follower count {followerCount}, following count {followingCount}, friend count {friendCount}, heart count {heartCount}, post count {post_count}.")
+            logging.info(f"User {UserInfo.source_name} has follower count {followerCount}, following count {followingCount}, friend count {friendCount}, heart count {heartCount}, post count {post_count}.")
 
             user_videos = []
 
@@ -102,7 +103,7 @@ async def insert_video():
             video_createtime = select_data["createTime"]
             video_description = str(select_data["desc"])
             video_url = "https://www.tiktok.com/@{}/video/{}".format(
-                "truesight_lover001", select_data["id"]
+                "cnimyanmar09", select_data["id"]
             )
             
             # video_author = "orginal"
@@ -165,7 +166,7 @@ async def insert_video():
                     app.db.session.add(users_videos)
                     await asyncio.sleep(3)
                     app.db.session.commit()
-                    print(
+                    logging.info(
                         "video data source is added successful, source id : {}, video id : {}, comment : {}, collect : {}, play : {}, share : {}".format(
                             source_id,video_id,video_commentcount,video_collectcount,video_playcount,video_sharecount
                         )
@@ -203,7 +204,7 @@ async def insert_video():
 
                     # Execute the insert statement
                     app.db.session.execute(insert_allcontent)
-                    print("Added content id values : {} for network id 5".format(ids))
+                    logging.debug("Added content id values : {} for network id 5".format(ids))
 
                 except Exception as e:
                     print(f"Error updating data: {e}")
@@ -233,7 +234,7 @@ async def insert_video():
                     app.db.session.execute(update_user_videos)
                     await asyncio.sleep(3)
                     app.db.session.commit()
-                    print(
+                    logging.info(
                         "video data source is updated successful,source id : {}, video id : {},comment : {}, collect : {}, play : {}, share : {}".format(
                             source_id,video_id,video_commentcount,video_collectcount,video_playcount,video_sharecount
                         )
@@ -253,7 +254,7 @@ if __name__ == "__main__":
     all_users = session.query(users).with_entities(app.TikTokSources.source_name).all()
     rand_source = random.sample(all_users, 7)
     sources = ["".join(user) for user in rand_source]
-    print(sources)
+    logging.debug(f"Fetching sources from db : {sources}")
 
     # source_name = input("Enter source name : ")
     # sources = [source_name] #yangonmediagroup #1108 #elevenmedia sayargyi7635 xinhuamyanmar hkwanntout mtnewstoday npnews3 cnimyanmar09 shwemm143 97media_myanmar dvb.burmese people.media1

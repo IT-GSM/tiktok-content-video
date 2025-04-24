@@ -29,6 +29,7 @@ class TikTokHashKey(db.Model):
     #source_id = db.Column(BIGINT)
     hash_name = db.Column(db.String())
     hash_check = db.Column(db.Boolean,unique=False, default=True)
+    hash_service = db.Column(db.String())
     
 class TikTokUsersInfo(db.Model):
     __tablename__ = 'tbl_tk_users_info'

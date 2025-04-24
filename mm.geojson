@@ -1,0 +1,278 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 1,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Destroyed",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 994,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.14302985, 19.7298313]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.1"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 2,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Destroyed",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 994,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.14669232, 19.7310994]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.2"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 3,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.15635587, 19.74473798]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.3"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 4,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Destroyed",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 994,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.15507337, 19.74833132]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.4"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 5,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.16478906, 19.75866429]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.5"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 6,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Possibly damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.15525028, 19.87791831]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.6"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 7,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Possibly damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.15218713, 19.88040936]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.7"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 8,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Possibly damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.17228554, 19.74836142]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.8"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 9,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Possibly damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.18159827, 19.75475974]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.9"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 10,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Possibly damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.18168248, 19.75486984]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.10"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 11,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.18372237, 19.75549612]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.11"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 12,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.18620904, 19.76023949]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.12"
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "ogc_fid": 13,
+          "obj_type": "11-Residential Buildings",
+          "name": "Unknown",
+          "info": "997-Not Applicable",
+          "simplified": "Residential",
+          "damage_gra": "Possibly damaged",
+          "det_method": "Photo-interpretation",
+          "notation": "Building point",
+          "or_src_id": 2,
+          "dmg_src_id": 2,
+          "cd_value": "Not Applicable"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [96.20531245, 19.90771199]
+        },
+        "id": "emsr798_aoi26_gra_product_builtupp_v1.13"
+      }
+    ]
+  }

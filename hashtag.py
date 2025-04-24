@@ -9,6 +9,7 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
 import random
 import logging
+import csv
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -34,10 +35,48 @@ class HashInfo:
                 await api.create_sessions(ms_tokens=[ms_token, ms_token1, ms_token2], num_sessions=1, sleep_after=3, headless=False)
                 tag = api.hashtag(name=HashInfo.hashkey)
                 hashtag_data = []
-                async for video in tag.videos(count=50):
+                async for video in tag.videos(count=150):
                     hashtag_data.append(video.as_dict)
                     hash_data = json.dumps(hashtag_data, indent=4)
                     hash_out_data = json.loads(hash_data)
+
+                    # Save data to CSV
+                    # csv_file = f"{HashInfo.hashkey}_22_4_25.csv"
+                    # with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
+                    #     writer = csv.writer(file)
+                    #     # Write header
+                    #     writer.writerow([
+                    #         "Video ID", "Create Time", "Duration", "Description",
+                    #         "Author ID", "Author Nickname", "Author Unique ID",
+                    #         "Digg Count", "Follower Count", "Following Count",
+                    #         "Friend Count", "Heart Count", "Video Count",
+                    #         "Collect Count", "Comment Count", "Digg Count",
+                    #         "Play Count", "Share Count", "Video URL"
+                    #     ])
+                    #     # Write video data
+                    #     for hashtag in hash_out_data:
+                    #         writer.writerow([
+                    #             hashtag['id'],
+                    #             datetime.utcfromtimestamp(hashtag['createTime']),
+                    #             hashtag['video']['duration'],
+                    #             hashtag['desc'],
+                    #             hashtag['author']['id'],
+                    #             hashtag['author']['nickname'],
+                    #             hashtag['author']['uniqueId'],
+                    #             hashtag['authorStats']['diggCount'],
+                    #             hashtag['authorStats']['followerCount'],
+                    #             hashtag['authorStats']['followingCount'],
+                    #             hashtag['authorStats']['friendCount'],
+                    #             hashtag['authorStats']['heart'],
+                    #             hashtag['authorStats']['videoCount'],
+                    #             hashtag['stats']['collectCount'],
+                    #             hashtag['stats']['commentCount'],
+                    #             hashtag['stats']['diggCount'],
+                    #             hashtag['stats']['playCount'],
+                    #             hashtag['stats']['shareCount'],
+                    #             f"https://www.tiktok.com/@{hashtag['author']['uniqueId']}/video/{hashtag['id']}"
+                    #         ])
+                    # logger.info(f"Saved hashtag data to {csv_file}")
 
                     with app.app.app_context():
                         app.db.create_all()
@@ -176,10 +215,10 @@ if __name__ == "__main__":
     all_hashtag = session.query(users).with_entities(app.TikTokHashKey.hash_name).filter(app.TikTokHashKey.hash_check == True).all()
     rand_hash = random.sample(all_hashtag, 5)
     sources = [''.join(user) for user in rand_hash] 
-    logger.debug(f"Random hashtags selected: {sources}")
+    # logger.debug(f"Random hashtags selected: {sources}")
     
     # source_name = input("Enter hash name: ")
-    # sources = ["ပြည်သူ့စစ်မှုထမ်း"]
+    # sources = ["မချစ်သင့်သော"]
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(HashInfo.get_hashtag_videos(sources))

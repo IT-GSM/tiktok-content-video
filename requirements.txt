@@ -1,8 +1,11 @@
-Flask==3.0.2
-Flask-Migrate==4.0.5
-Flask-SQLAlchemy==3.1.1
+Flask
+Flask-Migrate
+Flask-SQLAlchemy
 requests>=2.31.0,<3.0
 playwright==1.39.0
+requests>=2.31.0,<3.0
+httpx>=0.27.0,<1.0
 psycopg2-binary==2.9.9
 SQLAlchemy==2.0.27
 TikTokApi==6.4.0
+python-dotenv
