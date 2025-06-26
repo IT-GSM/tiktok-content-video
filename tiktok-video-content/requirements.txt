@@ -1,0 +1,12 @@
+TikTokApi==6.4.0
+SQLAlchemy==2.0.27
+# asyncio
+# json
+# os
+# logging
+# random
+# datetime
+psycopg2-binary
+playwright==1.32.0
+Flask-Migrate
+Flask-SQLAlchemy
