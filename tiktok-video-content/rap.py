@@ -36,6 +36,13 @@ engine = create_engine(database_url)
 # )
 ms_token = os.environ.get("ms_token", None)
 
+def get_nested(data, *keys):
+        """Safely get nested dictionary keys, returns None if any key is missing."""
+        for key in keys:
+            if not isinstance(data, dict) or key not in data:
+                return None
+            data = data[key]
+        return data
 
 class UserInfo:
     o_data = []
@@ -58,9 +65,15 @@ class UserInfo:
                 try:
                     user_data = await user.info()
                 except EmptyResponseException as e:
-                    logging.error(
-                        f"TikTok returned an empty response for user info '{user_name}': {e}"
-                    )
+                    logging.error(f"TikTok returned an empty response for user info '{user_name}': {e}")
+                    continue
+
+                # Defensive: check for expected keys
+                if (
+                    not user_data
+                    or get_nested(user_data, "userInfo", "user") is None
+                ):
+                    logging.error(f"User info missing 'user' key for '{user_name}': {user_data}")
                     continue
 
                 UserInfo.o_data = user_data
@@ -312,18 +325,22 @@ class UserInfo:
         with app.app.app_context():
             app.db.create_all()
 
-            source_id = UserInfo.o_data["userInfo"]["user"]["id"]
-            user_title = UserInfo.o_data["shareMeta"]["title"]
-            user_nickname = UserInfo.o_data["userInfo"]["user"]["nickname"]
-            user_uniqueId = UserInfo.o_data["userInfo"]["user"]["uniqueId"]
-            user_relation = UserInfo.o_data["userInfo"]["user"]["relation"]
-            user_diggcount = UserInfo.o_data["userInfo"]["stats"]["diggCount"]
-            user_followercount = UserInfo.o_data["userInfo"]["stats"]["followerCount"]
-            user_followingcount = UserInfo.o_data["userInfo"]["stats"]["followingCount"]
-            user_friendcount = UserInfo.o_data["userInfo"]["stats"]["friendCount"]
-            user_heart = UserInfo.o_data["userInfo"]["stats"]["heart"]
-            user_videocount = UserInfo.o_data["userInfo"]["stats"]["videoCount"]
-            user_url = "https://www.tiktok.com/@{}".format(user_uniqueId)
+            source_id = get_nested(UserInfo.o_data, "userInfo", "user", "id")
+            if source_id is None:
+                logging.error("Missing 'user' key in userInfo, skipping user insert.")
+                return
+
+            user_title = get_nested(UserInfo.o_data, "shareMeta", "title") or ""
+            user_nickname = get_nested(UserInfo.o_data, "userInfo", "user", "nickname") or ""
+            user_uniqueId = get_nested(UserInfo.o_data, "userInfo", "user", "uniqueId") or ""
+            user_relation = get_nested(UserInfo.o_data, "userInfo", "user", "relation") or ""
+            user_diggcount = get_nested(UserInfo.o_data, "userInfo", "stats", "diggCount") or 0
+            user_followercount = get_nested(UserInfo.o_data, "userInfo", "stats", "followerCount") or 0
+            user_followingcount = get_nested(UserInfo.o_data, "userInfo", "stats", "followingCount") or 0
+            user_friendcount = get_nested(UserInfo.o_data, "userInfo", "stats", "friendCount") or 0
+            user_heart = get_nested(UserInfo.o_data, "userInfo", "stats", "heart") or 0
+            user_videocount = get_nested(UserInfo.o_data, "userInfo", "stats", "videoCount") or 0
+            user_url = f"https://www.tiktok.com/@{user_uniqueId}"
 
             users = app.TikTokUsersInfo(
                 source_id=source_id,
@@ -385,6 +402,8 @@ class UserInfo:
                     app.db.session.rollback()
 
             app.db.session.close()
+
+    
 
 
 if __name__ == "__main__":
