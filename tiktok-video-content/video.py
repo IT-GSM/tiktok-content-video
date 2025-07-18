@@ -110,7 +110,7 @@ class UserInfo:
                 UserInfo.vo_data = json.loads(v_data)
 
                 await UserInfo.insert_video()
-                await UserInfo.insert_user()
+                # await UserInfo.insert_user()
     ### for database user
     # user = api.user(UserInfo.source)
     ### for specific user
@@ -402,46 +402,68 @@ class UserInfo:
 
             app.db.session.close()
 
-if __name__ == "__main__":
-    # asyncio.run(UserInfo.user_profile_data(all_users="elevenmedia"))
+async def check_and_crawl_videos():
     metadata = MetaData()
     users = Table("tbl_tk_sources", metadata, autoload_with=engine)
     Session = sessionmaker(bind=engine)
     session = Session()
-
-    # all_users = session.query(users).with_entities(app.TikTokSources.source_name).filter(app.TikTokSources.owner != 1).all()
-    all_users = (
-        session.query(users)
-        .with_entities(app.TikTokSources.source_name)
-        .filter(
+    try:
+        all_users = session.query(users).with_entities(app.TikTokSources.source_name).filter(
             (app.TikTokSources.owner == None) & (app.TikTokSources.source_check == True)
-        )
-        .all()
-    )
-    # rand_source = random.sample(all_users, 7)
-    # sources = ["".join(user) for user in rand_source]
-    # print(sources)
+        ).all()
+        all_users_list = [user.source_name for user in all_users]
+        sample_size = min(7, len(all_users_list))
+        rand_source = random.sample(all_users_list, sample_size)
+        print(rand_source)
+        await UserInfo.user_profile_data(rand_source)
+    finally:
+        session.close()
 
-    all_users_list = [user.source_name for user in all_users]
-    sample_size = min(
-        3, len(all_users_list)
-    )  # Ensure sample size is not larger than the population
-    rand_source = random.sample(all_users_list, sample_size)
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(check_and_crawl_videos())
+    loop.close()
 
-    sources = ["".join(user) for user in rand_source]
-    print(sources)
+# if __name__ == "__main__":
+#     # asyncio.run(UserInfo.user_profile_data(all_users="elevenmedia"))
+#     metadata = MetaData()
+#     users = Table("tbl_tk_sources", metadata, autoload_with=engine)
+#     Session = sessionmaker(bind=engine)
+#     session = Session()
 
-    # source_name = input("Enter source name : ")
-    # sources = [source_name] #yangonmediagroup #1108 #elevenmedia sayargyi7635 xinhuamyanmar hkwanntout mtnewstoday npnews3 cnimyanmar09 shwemm143 97media_myanmar dvb.burmese people.media1
+#     # all_users = session.query(users).with_entities(app.TikTokSources.source_name).filter(app.TikTokSources.owner != 1).all()
+#     all_users = (
+#         session.query(users)
+#         .with_entities(app.TikTokSources.source_name)
+#         .filter(
+#             (app.TikTokSources.owner == None) & (app.TikTokSources.source_check == True)
+#         )
+#         .all()
+#     )
+#     # rand_source = random.sample(all_users, 7)
+#     # sources = ["".join(user) for user in rand_source]
+#     # print(sources)
 
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete((UserInfo.user_profile_data(sources)))
+#     all_users_list = [user.source_name for user in all_users]
+#     sample_size = min(
+#         3, len(all_users_list)
+#     )  # Ensure sample size is not larger than the population
+#     rand_source = random.sample(all_users_list, sample_size)
 
-    # loop.close()
-    asyncio.run(UserInfo.user_profile_data(sources))
-    session.close()
-    logging.info("Finished processing sources. Exiting cleanly.")
-    sys.exit(0)
+#     sources = ["".join(user) for user in rand_source]
+#     print(sources)
+
+#     # source_name = input("Enter source name : ")
+#     # sources = [source_name] #yangonmediagroup #1108 #elevenmedia sayargyi7635 xinhuamyanmar hkwanntout mtnewstoday npnews3 cnimyanmar09 shwemm143 97media_myanmar dvb.burmese people.media1
+
+#     # loop = asyncio.get_event_loop()
+#     # loop.run_until_complete((UserInfo.user_profile_data(sources)))
+
+#     # loop.close()
+#     asyncio.run(UserInfo.user_profile_data(sources))
+#     session.close()
+#     logging.info("Finished processing sources. Exiting cleanly.")
+#     sys.exit(0)
 
     # loop = asyncio.get_event_loop()
     # try:

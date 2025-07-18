@@ -41,4 +41,4 @@ RUN python -m playwright install
 
 COPY . .
 
-CMD ["python", "comments.py"]
+CMD ["python", "rap.py"]
