@@ -61,6 +61,7 @@ class UserInfo:
             )
 
             for user_name in all_users:
+                UserInfo.source = user_name
                 user = api.user(user_name)
                 try:
                     user_data = await user.info()
