@@ -60,6 +60,8 @@ class UserInfo:
             )
 
             for user_name in all_users:
+                # Set the current username for use in video_url and other fields
+                UserInfo.source = user_name
                 user = api.user(user_name)
                 try:
                     user_data = await user.info()
