@@ -111,11 +111,11 @@ class UserInfo:
                 v_data = json.dumps(user_videos, indent=4)
                 UserInfo.vo_data = json.loads(v_data)
 
-                await UserInfo.insert_video()
+                await UserInfo.insert_video(user_name)
                 # await UserInfo.insert_user()
     
 
-    async def insert_video():
+    async def insert_video(user_name):
         with app.app.app_context():
             app.db.create_all()
 
@@ -127,7 +127,7 @@ class UserInfo:
                     continue
                 video_createtime = get_nested(select_data, "createTime")
                 video_description = str(get_nested(select_data, "desc") or "")
-                video_url = f"https://www.tiktok.com/@{UserInfo.source}/video/{video_id}"
+                video_url = f"https://www.tiktok.com/@{user_name}/video/{video_id}"
 
                 music = get_nested(select_data, "music") or {}
                 video_author = music.get("authorName", "orginal")
