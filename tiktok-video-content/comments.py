@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 from sqlalchemy import update
 import app
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Configure logging
 logging.basicConfig(
@@ -17,6 +17,10 @@ logging.basicConfig(
 )
 
 ms_token = os.environ.get("ms_token", None)
+
+# ms_token = os.environ.get(
+#     "mwlCTUQCgBh7nhQSEJGC_30BbhrNis1tqIzk5vlEbmlYzoUyNOfc6wHkqreTCG1mmGbrUCLSC3QyvWJ49Ycyw1vfRXbZx9vUiQga1vUId5QQG0WYJVoG2glr71iyIKwVw5VxuCGmRqx_Cg==", None
+# )
 
 database_url = "postgresql://fbs:yah7WUy1Oi8G@192.168.11.202:5432/fbs"
 engine = create_engine(database_url)
@@ -42,7 +46,7 @@ async def get_comments(video_id, comment_count):
             headless=True,
         )
 
-        vdId = api.video(id=video_id)
+        vdId = api.video(id="7543806110864559368")
         async for comment in vdId.comments(count=comment_count):
             if comment is not None:
                 comment_data.append(comment.as_dict)
@@ -145,9 +149,28 @@ async def get_comments(video_id, comment_count):
 async def check_and_crawl_comments():
     with app.app.app_context():
         app.db.create_all()
-        videos = app.TikTokVideosInfo.query.all()
-        if len(videos) > 9:
-            videos = random.sample(videos, 9)
+        # videos = app.TikTokVideosInfo.query.all()
+
+        # Get current UTC time and 24 hours ago
+        now = datetime.utcnow()
+        last_24h = now - timedelta(hours=24)
+        # Filter videos from the last 24 hours
+        # videos = (
+        #     app.TikTokVideosInfo.query
+        #     .filter(app.TikTokVideosInfo.video_createtime >= last_24h)
+        #     .order_by(app.TikTokVideosInfo.video_createtime.desc())
+        #     .limit(1000)
+        #     .all()
+        # )
+
+        videos = (
+            app.TikTokVideosInfo.query
+            .order_by(app.TikTokVideosInfo.id.desc())
+            .limit(100)
+            .all()
+        )
+        if len(videos) > 30:
+            videos = random.sample(videos, 30)
         for video in videos:
             if video.video_commentcount > 1:
                 logging.debug(
