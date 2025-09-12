@@ -87,7 +87,7 @@ async def get_comments(video_id, comment_count):
     try:
         async with TikTokApi() as api:
             await api.create_sessions(
-                ms_tokens=["eKceaaF8LSRg8q2vT8QePTPF8RD9j1Xl7tiekKtqC0kDU5yldprw_wNVHNrHYoDP0vjgsqb89-xYjKh7EhIE6vULnluXTmAfuwSNka8BbUltC7zQ8Cc6thWEFM4bvnYWdees4FY34mJ2Fw=="],
+                ms_tokens=[ms_token],
                 num_sessions=1,
                 sleep_after=5,
                 headless=True,
