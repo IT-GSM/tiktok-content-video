@@ -21,6 +21,8 @@ class TikTokSources(db.Model):
     source_name = db.Column(db.String())
     owner = db.Column(db.Integer)
     source_check = db.Column(db.Boolean,unique=False, default=True)
+    crawl_status = db.Column(db.String(), default="onready")  # onready, onprocess, success
+    crawl_status_updated = db.Column(TIMESTAMP(timezone=True), default=datetime.datetime.utcnow)  # Track when status was last   # Added for crawl workflow
 
 class TikTokHashKey(db.Model):
     __tablename__ = 'tbl_tk_hashtag_sources'
@@ -70,6 +72,10 @@ class TikTokVideosInfo(db.Model):
     video_diggcount = db.Column(db.Integer)
     video_playcount = db.Column(db.Integer)
     video_sharecount = db.Column(db.Integer)
+
+    # Comment crawl status management
+    crawl_status = db.Column(db.String(), default="onready")  # onready, onprocess, success
+    crawl_status_updated = db.Column(TIMESTAMP(timezone=True), default=datetime.datetime.utcnow)  # Track when status was last updated
 
 class TiktokCommentsInfo(db.Model):
     __tablename__ = 'tbl_tk_comments_info'
