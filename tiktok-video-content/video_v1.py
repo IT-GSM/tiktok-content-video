@@ -86,6 +86,7 @@ def reset_expired_success_states():
             logging.error(f"Error resetting expired success states: {e}")
             app.db.session.rollback()
 
+
 class UserInfo:
     o_data = []
     vo_data = []
@@ -114,6 +115,18 @@ class UserInfo:
                     user = api.user(user_name)
                     try:
                         user_data = await user.info()
+                        
+                        # Check if we got an unexpected status code response or empty user data
+                        if isinstance(user_data, dict) and 'userInfo' in user_data:
+                            user_info = user_data.get('userInfo', {})
+                            if isinstance(user_info, dict) and 'user' in user_info:
+                                user_obj = user_info.get('user', {})
+                                if not user_obj or not isinstance(user_obj, dict):
+                                    logging.error(f"Got an unexpected status code or empty user data for '{user_name}': {user_data}")
+                                    logging.warning(f"User '{user_name}' might be private, deleted, or have restricted access")
+                                    update_crawl_status(user_name, "onready")
+                                    continue
+                        
                     except EmptyResponseException as e:
                         logging.error(f"TikTok returned an empty response for user info '{user_name}': {e}")
                         update_crawl_status(user_name, "onready")  # Reset to onready on error
@@ -130,32 +143,19 @@ class UserInfo:
 
                     UserInfo.o_data = user_data
 
-                    # Safely access user stats with better error handling
-                    try:
-                        stats = user_data.get("userInfo", {}).get("stats", {})
-                        followerCount = stats.get("followerCount")
-                        followingCount = stats.get("followingCount")
-                        friendCount = stats.get("friendCount")
-                        heartCount = stats.get("heartCount")
-                        post_count = stats.get("videoCount")
-                    except Exception as stats_error:
-                        logging.error(f"Error accessing user stats for '{user_name}': {stats_error}")
-                        logging.error(f"User data structure: {user_data}")
-                        update_crawl_status(user_name, "onready")
-                        continue
+                    followerCount = user_data["userInfo"]["stats"].get("followerCount")
+                    followingCount = user_data["userInfo"]["stats"].get("followingCount")
+                    friendCount = user_data["userInfo"]["stats"].get("friendCount")
+                    heartCount = user_data["userInfo"]["stats"].get("heartCount")
+                    post_count = user_data["userInfo"]["stats"].get("videoCount")
                     logging.info(
                         f"User {user_name} has follower count {followerCount}, following count {followingCount}, friend count {friendCount}, heart count {heartCount}, post count {post_count}."
                     )
 
                     user_videos = []
 
-                    try:
-                        r_data = json.dumps(user_data, indent=4)
-                        UserInfo.o_data = json.loads(r_data)
-                    except Exception as json_error:
-                        logging.error(f"Error processing user data JSON for '{user_name}': {json_error}")
-                        update_crawl_status(user_name, "onready")
-                        continue
+                    r_data = json.dumps(user_data, indent=4)
+                    UserInfo.o_data = json.loads(r_data)
 
                     try:
                         async for video in user.videos(count=30):
@@ -166,10 +166,6 @@ class UserInfo:
                         )
                         update_crawl_status(user_name, "onready")  # Reset to onready on error
                         continue
-                    except Exception as video_error:
-                        logging.error(f"Error fetching videos for '{user_name}': {video_error}")
-                        update_crawl_status(user_name, "onready")
-                        continue
 
                     if not user_videos:
                         logging.warning(
@@ -178,25 +174,19 @@ class UserInfo:
                         update_crawl_status(user_name, "onready")  # Reset to onready on error
                         continue
 
-                    try:
-                        v_data = json.dumps(user_videos, indent=4)
-                        UserInfo.vo_data = json.loads(v_data)
-                    except Exception as video_json_error:
-                        logging.error(f"Error processing video data JSON for '{user_name}': {video_json_error}")
-                        update_crawl_status(user_name, "onready")
-                        continue
+                    v_data = json.dumps(user_videos, indent=4)
+                    UserInfo.vo_data = json.loads(v_data)
 
                     await UserInfo.insert_video(user_name)
-                    await UserInfo.insert_user()
+                    # await UserInfo.insert_user()
                     
                     # Set status to success after crawling is complete
                     update_crawl_status(user_name, "success")
                     
                 except Exception as e:
                     logging.error(f"Unexpected error while crawling user '{user_name}': {e}")
-                    logging.error(f"Error type: {type(e).__name__}")
-                    logging.error(f"Error details: {str(e)}")
                     update_crawl_status(user_name, "onready")  # Reset to onready on error
+                    continue
     
 
     async def insert_video(user_name):
@@ -204,10 +194,19 @@ class UserInfo:
             app.db.create_all()
 
             for select_data in UserInfo.vo_data:
-                video_id = get_nested(select_data, "id")
-                source_id = get_nested(UserInfo.o_data, "userInfo", "user", "id")
-                if video_id is None or source_id is None:
-                    logging.error(f"Missing video_id or source_id, skipping video insert. Data: {select_data}")
+                try:
+                    video_id = get_nested(select_data, "id")
+                    source_id = get_nested(UserInfo.o_data, "userInfo", "user", "id")
+                    if video_id is None or source_id is None:
+                        logging.error(f"Missing video_id or source_id, skipping video insert. Data: {select_data}")
+                        continue
+                except KeyError as e:
+                    logging.error(f"KeyError accessing video data for user '{user_name}': {e}")
+                    logging.error(f"Video data structure: {select_data}")
+                    continue
+                except Exception as e:
+                    logging.error(f"Unexpected error processing video data for user '{user_name}': {e}")
+                    logging.error(f"Video data structure: {select_data}")
                     continue
                 video_createtime = get_nested(select_data, "createTime")
                 video_description = str(get_nested(select_data, "desc") or "")
@@ -357,9 +356,19 @@ class UserInfo:
         with app.app.app_context():
             app.db.create_all()
 
-            source_id = get_nested(UserInfo.o_data, "userInfo", "user", "id")
-            if source_id is None:
-                logging.error("Missing 'user' key in userInfo, skipping user insert.")
+            try:
+                source_id = get_nested(UserInfo.o_data, "userInfo", "user", "id")
+                if source_id is None:
+                    logging.error("Missing 'user' key in userInfo, skipping user insert.")
+                    logging.error(f"User data structure: {UserInfo.o_data}")
+                    return
+            except KeyError as e:
+                logging.error(f"KeyError accessing user data: {e}")
+                logging.error(f"User data structure: {UserInfo.o_data}")
+                return
+            except Exception as e:
+                logging.error(f"Unexpected error accessing user data: {e}")
+                logging.error(f"User data structure: {UserInfo.o_data}")
                 return
 
             user_title = get_nested(UserInfo.o_data, "shareMeta", "title") or ""
@@ -444,10 +453,10 @@ async def check_and_crawl_videos():
     Session = sessionmaker(bind=engine)
     session = Session()
     try:
-        # Only get users with onready status for crawling
+        # Only get users with onready status for crawling owner=1 RAP, owner=2 media, owner=3 USDP, owner=4 otherparty
         all_users = session.query(users).with_entities(app.TikTokSources.source_name).filter(
-            (app.TikTokSources.owner == None) & 
-            (app.TikTokSources.source_check == True) &
+             
+            (app.TikTokSources.source_check == True) & (app.TikTokSources.owner == 4) &
             (app.TikTokSources.crawl_status == "onready")
         ).all()
         all_users_list = [user.source_name for user in all_users]
@@ -458,7 +467,7 @@ async def check_and_crawl_videos():
             
         sample_size = min(30, len(all_users_list))
         rand_source = random.sample(all_users_list, sample_size)
-        # logging.info(f"Selected users for crawling: {rand_source}")
+        print(rand_source)
         await UserInfo.user_profile_data(rand_source)
     finally:
         session.close()
