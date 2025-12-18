@@ -101,17 +101,27 @@ class UserInfo:
             update_crawl_status(user_name, "onprocess")
         
         async with TikTokApi() as api:
-            await api.create_sessions(
-                ms_tokens=["eKceaaF8LSRg8q2vT8QePTPF8RD9j1Xl7tiekKtqC0kDU5yldprw_wNVHNrHYoDP0vjgsqb89-xYjKh7EhIE6vULnluXTmAfuwSNka8BbUltC7zQ8Cc6thWEFM4bvnYWdees4FY34mJ2Fw=="],
-                num_sessions=1,
-                sleep_after=5,
-                headless=True,
-            )
+            try:
+                await api.create_sessions(
+                    ms_tokens=["eKceaaF8LSRg8q2vT8QePTPF8RD9j1Xl7tiekKtqC0kDU5yldprw_wNVHNrHYoDP0vjgsqb89-xYjKh7EhIE6vULnluXTmAfuwSNka8BbUltC7zQ8Cc6thWEFM4bvnYWdees4FY34mJ2Fw=="],
+                    num_sessions=1,
+                    sleep_after=5,
+                    headless=True,
+                    browser='chromium',  # webkit is not supported, using chromium instead
+                )
+            except Exception as e:
+                logging.error(f"Failed to create TikTok sessions: {e}")
+                # Reset all users to onready if session creation fails
+                for user_name in all_users:
+                    update_crawl_status(user_name, "onready")
+                return
 
             for user_name in all_users:
                 try:
                     # Set the current username for use in video_url and other fields
                     UserInfo.source = user_name
+                    # Add random delay between requests to appear more human-like
+                    await asyncio.sleep(random.uniform(2, 5))
                     user = api.user(user_name)
                     try:
                         user_data = await user.info()
@@ -128,8 +138,10 @@ class UserInfo:
                                     continue
                         
                     except EmptyResponseException as e:
-                        logging.error(f"TikTok returned an empty response for user info '{user_name}': {e}")
+                        logging.error(f"TikTok returned an empty response for user info '{user_name}': {e} -> TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='chromium', consider using a proxy")
                         update_crawl_status(user_name, "onready")  # Reset to onready on error
+                        # Add delay before retrying next user to avoid rate limiting
+                        await asyncio.sleep(random.uniform(3, 7))
                         continue
 
                     # Defensive: check for expected keys
@@ -162,9 +174,11 @@ class UserInfo:
                             user_videos.append(video.as_dict)
                     except EmptyResponseException as e:
                         logging.error(
-                            f"TikTok returned an empty response for videos of '{user_name}': {e}"
+                            f"TikTok returned an empty response for videos of '{user_name}': {e} -> TikTok returned an empty response. They are detecting you're a bot, try some of these: headless=False, browser='chromium', consider using a proxy"
                         )
                         update_crawl_status(user_name, "onready")  # Reset to onready on error
+                        # Add delay before retrying next user to avoid rate limiting
+                        await asyncio.sleep(random.uniform(3, 7))
                         continue
 
                     if not user_videos:
@@ -465,7 +479,7 @@ async def check_and_crawl_videos():
             logging.info("No users with 'onready' status found for crawling")
             return
             
-        sample_size = min(30, len(all_users_list))
+        sample_size = min(10, len(all_users_list))
         rand_source = random.sample(all_users_list, sample_size)
         print(rand_source)
         await UserInfo.user_profile_data(rand_source)
